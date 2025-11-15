@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UploadResponse, TransformResponse, TransformOptions } from '../types/image.types';
+import { UploadResponse, TransformRequest, TransformResponse } from '../types/image.types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -10,15 +10,15 @@ const api = axios.create({
   },
 });
 
-export const imageApi = {
+export const imageAPI = {
   /**
    * Upload image to server
    */
   uploadImage: async (file: File): Promise<UploadResponse> => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('image', file);
 
-    const response = await axios.post<UploadResponse>(`${API_URL}/upload`, formData, {
+    const response = await axios.post(`${API_URL}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -28,31 +28,28 @@ export const imageApi = {
   },
 
   /**
-   * Transform image with given options
+   * Transform image
    */
-  transformImage: async (publicId: string, transformations: TransformOptions): Promise<TransformResponse> => {
-    const response = await api.post<TransformResponse>('/transform', {
-      publicId,
-      transformations,
-    });
-
+  transformImage: async (request: TransformRequest): Promise<TransformResponse> => {
+    const response = await api.post('/transform', request);
     return response.data;
   },
 
   /**
-   * Delete image from Cloudinary
+   * Download image
+   */
+  downloadImage: async (publicId: string, format: string = 'jpg', quality: number = 90): Promise<Blob> => {
+    const response = await api.get('/download', {
+      params: { publicId, format, quality },
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  /**
+   * Delete image
    */
   deleteImage: async (publicId: string): Promise<void> => {
     await api.delete(`/images/${publicId}`);
   },
-
-  /**
-   * Get image details
-   */
-  getImageDetails: async (publicId: string): Promise<any> => {
-    const response = await api.get(`/images/${publicId}`);
-    return response.data;
-  },
 };
-
-export default api;
