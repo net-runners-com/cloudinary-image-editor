@@ -1,4 +1,4 @@
-export interface ImageData {
+export interface UploadedImage {
   publicId: string;
   url: string;
   secureUrl: string;
@@ -8,7 +8,7 @@ export interface ImageData {
   bytes: number;
 }
 
-export interface TransformOptions {
+export interface ImageTransformations {
   resize?: {
     width?: number;
     height?: number;
@@ -32,10 +32,9 @@ export interface TransformOptions {
   };
 }
 
-export interface UploadResponse {
-  success: boolean;
-  data?: ImageData;
-  error?: string;
+export interface TransformRequest {
+  publicId: string;
+  transformations: ImageTransformations;
 }
 
 export interface TransformResponse {
@@ -44,5 +43,11 @@ export interface TransformResponse {
     url: string;
     secureUrl: string;
   };
+  error?: string;
+}
+
+export interface UploadResponse {
+  success: boolean;
+  data?: UploadedImage;
   error?: string;
 }
